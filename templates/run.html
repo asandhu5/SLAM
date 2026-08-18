@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Run in progress — SLAM Console{% endblock %}
+{% block content %}
+
+{% if run.status == 'error' %}
+<div class="panel panel-bracket">
+  <span class="bk-tl"></span><span class="bk-tr"></span><span class="bk-bl"></span><span class="bk-br"></span>
+  <div class="panel-title"><h3>Run Failed</h3></div>
+  <div class="banner banner-danger">{{ run.error }}</div>
+  <a href="{{ url_for('index') }}" class="btn btn-ghost" style="margin-top:14px;">Back to setup</a>
+</div>
+{% else %}
+
+<div class="hero" style="margin-bottom:20px;">
+  <h1>{{ run.dataset_label }}</h1>
+  <span class="led-badge st-{{ run.state | lower }}" id="state-badge"><span class="led led-pulse"></span> {{ run.state }}</span>
+</div>
+
+<div class="progress-meta">
+  <span id="progress-label">Frame {{ run.current_frame }} / {{ run.total_frames or run.max_frames }}</span>
+  <span id="progress-pct">0%</span>
+</div>
+<div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+<div class="readout-grid">
+  <div class="readout"><div class="r-label">Landmarks</div><div class="r-value accent" id="r-landmarks">{{ run.landmarks }}</div></div>
+  <div class="readout"><div class="r-label">Keyframes</div><div class="r-value" id="r-keyframes">{{ run.keyframes }}</div></div>
+  <div class="readout"><div class="r-label">Frame</div><div class="r-value" id="r-frame">{{ run.current_frame }}</div><div class="r-sub" id="r-frame-total">of {{ run.total_frames or run.max_frames }}</div></div>
+  <div class="readout"><div class="r-label">State</div><div class="r-value" id="r-state" style="font-size:1.1rem;">{{ run.state }}</div></div>
+</div>
+
+<div class="panel">
+  <div class="panel-title"><h3>Pipeline Log</h3></div>
+  <div class="console" id="console"></div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+{% block scripts %}
+<script>
+  window.__RUN__ = {
+    id: {{ run.id | tojson }},
+    status: {{ run.status | tojson }},
+    statusUrl: {{ url_for('api_status', run_id=run.id) | tojson }},
+    resultsUrl: {{ url_for('results', run_id=run.id) | tojson }}
+  };
+</script>
+<script src="{{ url_for('static', filename='js/run.js') }}"></script>
+{% endblock %}

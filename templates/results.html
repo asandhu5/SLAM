@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ run.dataset_label }} Results — SLAM Console{% endblock %}
+{% block content %}
+
+<div class="hero" style="margin-bottom:14px;">
+  <span class="led-badge {{ 'st-demo' if run.source == 'demo' else 'st-ready' }}"><span class="led"></span> {{ 'Sample Run' if run.source == 'demo' else 'Run Complete' }}</span>
+  <h1 style="margin-top:8px;">{{ run.dataset_label }}</h1>
+  <p class="lede">{{ run.processed_frames }} frames processed in {{ run.duration_seconds }}s &middot; {{ run.final_keyframes }} keyframes &middot; {{ run.final_landmarks }} landmarks</p>
+</div>
+
+<div style="margin-bottom:20px; display:flex; gap:10px;">
+  <a class="btn btn-solid btn-sm" href="{{ url_for('index') }}">▶ New Run</a>
+  <a class="btn btn-ghost btn-sm" href="{{ url_for('history') }}">History</a>
+</div>
+
+<div class="readout-grid">
+  <div class="readout">
+    <div class="r-label">ATE RMSE</div>
+    <div class="r-value accent">{{ '%.3f' % run.ATE_rmse if run.ATE_rmse is not none else '—' }}</div>
+    <div class="r-sub">{{ 'meters (aligned)' if run.ATE_rmse is not none else 'no ground truth' }}</div>
+  </div>
+  <div class="readout">
+    <div class="r-label">RPE RMSE</div>
+    <div class="r-value">{{ '%.3f' % run.RPE_rmse if run.RPE_rmse is not none else '—' }}</div>
+    <div class="r-sub">{{ 'meters/step' if run.RPE_rmse is not none else 'no ground truth' }}</div>
+  </div>
+  <div class="readout">
+    <div class="r-label">Recovered Scale</div>
+    <div class="r-value">{{ '%.2f' % run.scale if run.scale is not none else '—' }}</div>
+    <div class="r-sub">vs ground truth</div>
+  </div>
+  <div class="readout">
+    <div class="r-label">Duration</div>
+    <div class="r-value">{{ run.duration_seconds }}<span style="font-size:1rem;">s</span></div>
+    <div class="r-sub">{{ '%.0f' % (run.duration_seconds / run.processed_frames * 1000) if run.processed_frames else 0 }}ms/frame avg</div>
+  </div>
+</div>
+
+<div class="chart-grid">
+  <div class="panel panel-bracket">
+    <span class="bk-tl"></span><span class="bk-tr"></span><span class="bk-bl"></span><span class="bk-br"></span>
+    <div class="panel-title"><h3>Trajectory (top-down)</h3></div>
+    <div class="chart-box"><canvas id="chart-trajectory"></canvas></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><h3>Sparse Map (top-down)</h3></div>
+    <div class="chart-box"><canvas id="chart-map"></canvas></div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title"><h3>Tracking State Timeline</h3></div>
+  <div class="timeline" id="state-timeline"></div>
+  <div class="timeline-legend">
+    <span><span class="sw" style="background:var(--amber);"></span> Initializing</span>
+    <span><span class="sw" style="background:var(--green);"></span> Tracking</span>
+    <span><span class="sw" style="background:var(--red);"></span> Lost / Relocalizing</span>
+  </div>
+</div>
+
+<div class="chart-grid">
+  <div class="panel">
+    <div class="panel-title"><h3>Map Growth</h3></div>
+    <div class="chart-box"><canvas id="chart-growth"></canvas></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><h3>Keyframe Count</h3></div>
+    <div class="chart-box"><canvas id="chart-keyframes"></canvas></div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+  window.__RESULTS__ = {{ results | tojson }};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+{% endblock %}

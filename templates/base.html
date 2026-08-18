@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}SLAM Console{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <a class="sidebar-brand" href="{{ url_for('index') }}">
+      <span class="dot-mark"></span>
+      <div>
+        <div class="sidebar-brand-text">SLAM CONSOLE</div>
+        <div class="sidebar-brand-sub">monocular visual slam</div>
+      </div>
+    </a>
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('index') }}" class="{{ 'active' if active_page == 'setup' else '' }}"><span class="nav-icon">▶</span> New Run</a>
+      <a href="{{ url_for('history') }}" class="{{ 'active' if active_page == 'history' else '' }}"><span class="nav-icon">▤</span> History</a>
+    </nav>
+    <div class="sidebar-footer">
+      ORB features &middot; PnP tracking<br>
+      local BA &middot; g2o loop closure
+    </div>
+  </aside>
+  <div class="content">
+    <main class="container{{ ' container-wide' if active_page in ('results',) else '' }}">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% block scripts %}{% endblock %}
+</body>
+</html>

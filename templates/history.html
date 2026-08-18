@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}History — SLAM Console{% endblock %}
+{% block content %}
+
+<h2 style="font-family:var(--mono); font-size:1.3rem; margin-bottom:20px;">Run History</h2>
+
+{% if not runs %}
+<div class="panel empty-state">
+  No runs yet. <a href="{{ url_for('index') }}" class="cyan-text">Start one &rarr;</a>
+</div>
+{% else %}
+<div class="card-grid">
+  {% for r in runs %}
+  <a class="item-card" href="{{ url_for('results', run_id=r.id) if r.status == 'ready' else url_for('run_page', run_id=r.id) }}">
+    <span class="led-badge st-{{ r.status if r.status != 'running' else (r.state | lower) }}"><span class="led {{ 'led-pulse' if r.status == 'running' else '' }}"></span> {{ r.status | upper }}</span>
+    {% if r.source == 'demo' %}<span class="chip" style="margin-left:6px;">SAMPLE</span>{% endif %}
+    <div class="item-title">{{ r.dataset_label }}</div>
+    <div class="item-date">{{ r.max_frames }} frames &middot; {{ r.created_at[:10] if r.created_at else '' }}</div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

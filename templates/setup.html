@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}New Run — SLAM Console{% endblock %}
+{% block content %}
+
+<div class="hero">
+  <h1>Monocular SLAM, run against <span class="cyan-text">real sequences.</span></h1>
+  <p class="lede">ORB features &rarr; essential-matrix initialization &rarr; PnP tracking &rarr; continuous local mapping &rarr; sparse bundle adjustment &rarr; g2o pose-graph loop closure. Pick a dataset and watch it track frame by frame.</p>
+</div>
+
+{% if not config.tum_available and not config.kitti_sequences %}
+<div class="banner banner-warning">
+  No datasets found under <code>data/</code>. See <code>README.md</code> for how to fetch TUM fr1/desk or a KITTI odometry sequence.
+  {% if has_demo %} In the meantime, <a href="{{ url_for('demo') }}" class="cyan-text" style="font-weight:700;">view the sample run &rarr;</a>{% endif %}
+</div>
+{% endif %}
+
+<form id="setup-form" class="panel panel-bracket">
+  <span class="bk-tl"></span><span class="bk-tr"></span><span class="bk-bl"></span><span class="bk-br"></span>
+  <div class="panel-title"><h3>Run Parameters</h3></div>
+
+  <div class="field">
+    <label>Dataset</label>
+    <div class="option-grid" id="dataset-grid">
+      <label class="option-card {{ 'disabled' if not config.tum_available else '' }} {{ 'selected' if config.tum_available else '' }}" data-dataset="tum">
+        <input type="radio" name="dataset_kind" value="tum" {{ 'disabled' if not config.tum_available else '' }} {{ 'checked' if config.tum_available else '' }}>
+        <div class="option-name">TUM fr1/desk</div>
+        <div class="option-desc">Indoor handheld, 613 frames, real ground truth.{{ ' Not found under data/tum/.' if not config.tum_available else '' }}</div>
+      </label>
+      {% for seq in config.kitti_sequences %}
+      <label class="option-card {{ 'selected' if not config.tum_available and loop.first else '' }}" data-dataset="kitti" data-sequence="{{ seq }}">
+        <input type="radio" name="dataset_kind" value="kitti" data-sequence="{{ seq }}" {{ 'checked' if not config.tum_available and loop.first else '' }}>
+        <div class="option-name">KITTI seq{{ seq }}</div>
+        <div class="option-desc">Outdoor driving{{ ', real ground truth' if seq in ('00','01','02','03','04','05','06','07','08','09','10') else '' }}.</div>
+      </label>
+      {% endfor %}
+    </div>
+    {% if not config.kitti_sequences %}<div class="hint">No KITTI sequences found under data/kitti/. TUM only for now.</div>{% endif %}
+  </div>
+
+  <div class="field">
+    <label for="max_frames">Frame Count</label>
+    <div class="range-row">
+      <input type="range" id="max_frames" min="30" max="1000" step="10" value="300">
+      <span class="range-value" id="max_frames_value">300</span>
+    </div>
+    <div class="hint">~150-250ms/frame once tracking. 300 frames &asymp; 1 minute.</div>
+  </div>
+
+  <div id="form-error" class="banner banner-danger" style="display:none;"></div>
+
+  <button type="submit" class="btn btn-solid btn-block" id="start-btn" {{ 'disabled' if not config.tum_available and not config.kitti_sequences else '' }}>
+    ▶ Start SLAM Run
+  </button>
+  {% if has_demo %}
+  <a href="{{ url_for('demo') }}" class="btn btn-ghost btn-block" style="margin-top:10px;">View Sample Run Instead</a>
+  {% endif %}
+</form>
+
+<div class="panel" style="margin-top:18px;">
+  <div class="panel-title"><h3>Pipeline</h3></div>
+  <div class="chip-row">
+    <span class="chip">ORB-2000</span>
+    <span class="chip">grid-balanced</span>
+    <span class="chip">essential matrix init</span>
+    <span class="chip">PnP+RANSAC tracking</span>
+    <span class="chip chip-accent">continuous local mapping</span>
+    <span class="chip">sparse local BA</span>
+    <span class="chip chip-accent">g2o pose-graph loop closure</span>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/setup.js') }}"></script>
+{% endblock %}

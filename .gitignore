@@ -1,0 +1,20 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+slam/
+*.mp4
+trajectory.csv
+points.csv
+
+# Downloaded datasets (tens of GB) and web-app run history -- data/sample/
+# (the small bundled quick-start set) is intentionally NOT excluded here.
+data/kitti/
+data/tum/
+data/runs/
+data/index.json

@@ -1,0 +1,31 @@
+# ORB features, image IO, epipolar geometry, triangulation, and PnP.
+opencv-contrib-python==4.10.0.84
+
+# Dense arrays, linear algebra, and trajectory/math utilities.
+numpy==1.26.4
+
+# Rotations, sparse local bundle adjustment (least_squares w/ jac_sparsity),
+# and KD trees.
+scipy==1.13.1
+
+# Optional interactive 3D point cloud viewer for slam_system.py's
+# --visualize CLI flag. Not used by the web dashboard (app.py), which
+# renders 2D top-down views instead so it has no native-GUI dependency.
+open3d==0.18.0
+
+# 2D/3D plots for benchmark.py and visualizer.py's diagnostics figures.
+matplotlib==3.9.2
+
+# The web dashboard.
+Flask==3.1.3
+
+# Unit tests for geometry, feature extraction, matching, and benchmarking.
+pytest==8.3.2
+
+# Download and SLAM processing progress bars (CLI only).
+tqdm==4.66.5
+
+# Sparse pose-graph optimization backend for loop-closure correction
+# (pose_graph.py). Local bundle adjustment (bundle_adjuster.py) stays on
+# the portable SciPy path -- see that file's module docstring for why.
+g2o-python==0.0.12
